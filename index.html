@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>PHANToM Customer & Orders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 16px;
+    }
+    h1, h2 { margin: 8px 0; }
+    .card {
+      background: rgba(15,23,42,0.95);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(148,163,184,0.4);
+    }
+    label { display: block; margin-top: 8px; font-size: 14px; }
+    input, textarea, select {
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.primary {
+      background: linear-gradient(90deg,#22d3ee,#a855f7);
+      color: #020617;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border-bottom: 1px solid rgba(55,65,81,0.6);
+      padding: 6px 4px;
+      text-align: left;
+    }
+    th {
+      color: #9ca3af;
+      font-weight: 600;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>PHANToM Customer & Orders (HTML + Google Sheet)</h1>
+
+  <div class="card">
+    <h2>เพิ่มคำสั่งซื้อใหม่</h2>
+    <form id="orderForm">
+      <label>
+        ชื่อลูกค้า
+        <input type="text" name="CustomerName" required />
+      </label>
+      <label>
+        ช่องทางติดต่อ / เบอร์
+        <input type="text" name="ContactDetail" required />
+      </label>
+      <label>
+        ที่อยู่จัดส่ง
+        <textarea name="Address" rows="2" required></textarea>
+      </label>
+      <label>
+        รายการสินค้า
+        <textarea name="OrderItems" rows="3" required></textarea>
+      </label>
+      <button type="submit" class="primary">บันทึกคำสั่งซื้อ</button>
+      <span id="formStatus" style="margin-left:8px;font-size:13px;"></span>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>รายการคำสั่งซื้อทั้งหมด</h2>
+    <button id="reloadBtn">รีโหลดข้อมูล</button>
+    <div id="ordersContainer" style="margin-top:12px;overflow-x:auto;">
+      <table id="ordersTable">
+        <thead>
+          <tr>
+            <th>OrderID</th>
+            <th>ชื่อลูกค้า</th>
+            <th>สินค้า</th>
+            <th>สถานะจัดส่ง</th>
+            <th>สถานะชำระเงิน</th>
+            <th>สร้างเมื่อ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- data will be injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // !! ใส่ URL web app ของคุณตรงนี้ !!
+    const API_BASE = 'PASTE_YOUR_SCRIPT_URL_HERE'; 
+    // example: 'https://script.google.com/macros/s/AKfycby....../exec'
+
+    async function fetchOrders() {
+      const res = await fetch(API_BASE + '?action=listOrders');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'โหลดข้อมูลล้มเหลว');
+      return json.data;
+    }
+
+    function renderOrders(rows) {
+      const tbody = document.querySelector('#ordersTable tbody');
+      tbody.innerHTML = '';
+      if (!rows || rows.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.textContent = 'ยังไม่มีคำสั่งซื้อ';
+        tbody.appendChild(tr).appendChild(td);
+        return;
+      }
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+
+        const tdId = document.createElement('td');
+        tdId.textContent = row.OrderID || '';
+        tr.appendChild(tdId);
+
+        const tdName = document.createElement('td');
+        tdName.textContent = row.CustomerName || '';
+        tr.appendChild(tdName);
+
+        const tdItems = document.createElement('td');
+        tdItems.textContent = row.OrderItems || '';
+        tr.appendChild(tdItems);
+
+        const tdShip = document.createElement('td');
+        tdShip.textContent = row.ShippingStatus || '';
+        tr.appendChild(tdShip);
+
+        const tdPay = document.createElement('td');
+        tdPay.textContent = row.PaymentStatus || '';
+        tr.appendChild(tdPay);
+
+        const tdCreated = document.createElement('td');
+        tdCreated.textContent = row.CreatedAt
+          ? new Date(row.CreatedAt).toLocaleString()
+          : '';
+        tr.appendChild(tdCreated);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function loadOrders() {
+      try {
+        const rows = await fetchOrders();
+        renderOrders(rows);
+      } catch (err) {
+        console.error(err);
+        alert('โหลดข้อมูลไม่สำเร็จ: ' + err.message);
+      }
+    }
+
+    async function submitOrderForm(event) {
+      event.preventDefault();
+      const form = event.target;
+      const statusEl = document.getElementById('formStatus');
+
+      const payload = {
+        CustomerName: form.CustomerName.value,
+        ContactDetail: form.ContactDetail.value,
+        Address: form.Address.value,
+        OrderItems: form.OrderItems.value,
+        // สถานะเริ่มต้น (ต้องตรงกับหัวคอลัมน์ในชีต)
+        ShippingStatus: 'รอจัดส่ง',
+        PaymentStatus: 'ยังไม่ชำระเงิน',
+      };
+
+      statusEl.textContent = 'กำลังบันทึก...';
+
+      try {
+        const res = await fetch(API_BASE + '?action=addOrder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'บันทึกไม่สำเร็จ');
+
+        statusEl.textContent = 'บันทึกสำเร็จ ✅';
+        form.reset();
+        loadOrders();
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'ผิดพลาด: ' + err.message;
+      }
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', submitOrderForm);
+    document.getElementById('reloadBtn').addEventListener('click', loadOrders);
+
+    // โหลดครั้งแรก
+    loadOrders();
+  </script>
+</body>
+</html>

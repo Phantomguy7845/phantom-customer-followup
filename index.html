@@ -179,47 +179,43 @@
         alert('โหลดข้อมูลไม่สำเร็จ: ' + err.message);
       }
     }
+    
+async function submitOrderForm(event) {
+  event.preventDefault();
+  const form = event.target;
+  const statusEl = document.getElementById('formStatus');
 
-    async function submitOrderForm(event) {
-      event.preventDefault();
-      const form = event.target;
-      const statusEl = document.getElementById('formStatus');
+  const payload = {
+    CustomerName: form.CustomerName.value,
+    ContactDetail: form.ContactDetail.value,
+    Address: form.Address.value,
+    OrderItems: form.OrderItems.value,
+    ShippingStatus: 'รอจัดส่ง',
+    PaymentStatus: 'ยังไม่ชำระเงิน',
+  };
 
-      const payload = {
-        CustomerName: form.CustomerName.value,
-        ContactDetail: form.ContactDetail.value,
-        Address: form.Address.value,
-        OrderItems: form.OrderItems.value,
-        // สถานะเริ่มต้น (ต้องตรงกับหัวคอลัมน์ในชีต)
-        ShippingStatus: 'รอจัดส่ง',
-        PaymentStatus: 'ยังไม่ชำระเงิน',
-      };
+  statusEl.textContent = 'กำลังบันทึก...';
 
-      statusEl.textContent = 'กำลังบันทึก...';
+  // ใช้ URLSearchParams แทน JSON ตรง ๆ
+  const body = new URLSearchParams();
+  body.append('data', JSON.stringify(payload));
 
-      try {
-        const res = await fetch(API_BASE + '?action=addOrder', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error || 'บันทึกไม่สำเร็จ');
+  try {
+    const res = await fetch(API_BASE + '?action=addOrder', {
+      method: 'POST',
+      body, // ห้ามใส่ headers: { 'Content-Type': 'application/json' }
+    });
 
-        statusEl.textContent = 'บันทึกสำเร็จ ✅';
-        form.reset();
-        loadOrders();
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent = 'ผิดพลาด: ' + err.message;
-      }
+    const json = await res.json();
+    if (!json.success) {
+      throw new Error(json.error || 'บันทึกไม่สำเร็จ');
     }
 
-    document.getElementById('orderForm').addEventListener('submit', submitOrderForm);
-    document.getElementById('reloadBtn').addEventListener('click', loadOrders);
-
-    // โหลดครั้งแรก
+    statusEl.textContent = 'บันทึกสำเร็จ ✅';
+    form.reset();
     loadOrders();
-  </script>
-</body>
-</html>
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = 'ผิดพลาด: ' + err.message;
+  }
+}

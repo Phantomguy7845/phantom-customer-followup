@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Monitor Starter</title>
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__title">Phantom Customer Follow-up</div>
+      <p class="hero__subtitle">
+        Phase 1 scaffold พร้อม Node server + SQLite (native) สำหรับพัฒนาเว็บแอป
+        mobile-first.
+      </p>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Customer / Order Form</h2>
+        <p>หน้าฟอร์มลูกค้า + แชร์ลิงก์ (จะเพิ่มใน Phase ถัดไป)</p>
+        <a class="button" href="/customer.html">เปิดหน้าฟอร์มลูกค้า</a>
+      </section>
+      <section class="card">
+        <h2>Admin / Products</h2>
+        <p>จัดการสินค้าและสถานะ active / promotion / inactive</p>
+        <a class="button" href="/admin.html">เปิดหน้า Admin</a>
+      </section>
+      <section class="card">
+        <h2>Orders Monitor</h2>
+        <p>ตารางออเดอร์ทั้งหมด + filter/search + ปรับสถานะ</p>
+        <a class="button" href="/orders.html">เปิด Orders Monitor</a>
+      </section>
+      <section class="card">
+        <h2>Delivery Queue</h2>
+        <p>มอนิเตอร์คิวจัดส่ง + ปรับลำดับคิว + อัปเดตสถานะ</p>
+        <a class="button" href="/delivery.html">เปิดหน้า Delivery</a>
+      </section>
+    </main>
+
+    <section class="status" id="status-panel">
+      <div class="status__header">
+        <h3>Server Health</h3>
+        <button id="refresh-health" class="ghost">รีเฟรช</button>
+      </div>
+      <pre id="health-output">Loading...</pre>
+    </section>
+
+    <footer class="footer">
+      <small>Phase 1: server + static scaffold | ใช้ native node:sqlite (experimental)</small>
+    </footer>
+    <script src="/assets/js/pwa.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
+  </body>
+</html>

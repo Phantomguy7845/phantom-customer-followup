@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>สร้างออเดอร์ใหม่ | Phantom Customer Follow-up</title>
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__title">ฟอร์มลูกค้า + สร้างออเดอร์</div>
+      <p class="hero__subtitle">
+        ใส่ข้อมูลลูกค้า ที่อยู่ รายการสินค้า และสร้างออเดอร์ พร้อมหน้าตรวจสอบสถานะ
+      </p>
+      <div class="chip-row">
+        <a class="ghost" href="/">← กลับหน้าแรก</a>
+        <button id="refresh-products" class="ghost">รีเฟรชสินค้า</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="section__header">
+          <div>
+            <h2 class="section__title">สร้างออเดอร์ใหม่</h2>
+            <p class="section__hint">กรอกข้อมูลลูกค้าและเลือกสินค้า ขั้นตอนเดียวจบ</p>
+          </div>
+          <div class="pill">Phase 4 draft</div>
+        </div>
+
+        <form id="order-form" class="stack" autocomplete="off">
+          <div class="card card--sub">
+            <h3>1) ข้อมูลลูกค้า</h3>
+            <div class="two-col">
+              <label class="field">
+                <span>ชื่อลูกค้า *</span>
+                <input type="text" name="name" placeholder="เช่น คุณเอิร์ธ" required />
+              </label>
+              <label class="field">
+                <span>ช่องทางติดต่อหลัก *</span>
+                <select name="main_contact_type" required>
+                  <option value="phone">Phone</option>
+                  <option value="line">LINE</option>
+                  <option value="facebook">Facebook</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span>ข้อมูลช่องทาง *</span>
+              <input
+                type="text"
+                name="main_contact_value"
+                placeholder="เบอร์โทร / LINE ID / ลิงก์ Facebook"
+                required
+              />
+            </label>
+            <label class="field">
+              <span>ช่องทางอื่น (Optional)</span>
+              <textarea name="other_contacts" rows="2" placeholder="เช่น โทรสำรอง 080... หรือช่องทางแชทอื่น"></textarea>
+            </label>
+            <label class="field">
+              <span>บันทึกเพิ่ม (Optional)</span>
+              <textarea name="notes" rows="2" placeholder="ข้อมูลโภชนาการ แพ้ยา ฯลฯ"></textarea>
+            </label>
+          </div>
+
+          <div class="card card--sub">
+            <h3>2) ที่อยู่จัดส่ง</h3>
+            <div class="two-col">
+              <label class="field">
+                <span>ป้ายที่อยู่ (เช่น บ้าน / ออฟฟิศ)</span>
+                <input type="text" name="label" placeholder="บ้าน / ออฟฟิศ" />
+              </label>
+              <label class="field">
+                <span>จุดสังเกต</span>
+                <input type="text" name="extra_info" placeholder="หน้าปากซอยมี 7-11" />
+              </label>
+            </div>
+            <label class="field">
+              <span>ที่อยู่เต็ม *</span>
+              <textarea name="full_address" rows="3" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์" required></textarea>
+              <small class="hint">จะใช้ส่งให้ไรเดอร์/แผนกจัดส่ง</small>
+            </label>
+          </div>
+
+          <div class="card card--sub">
+            <h3>3) รายละเอียดจัดส่ง & การชำระเงิน</h3>
+            <div class="two-col">
+              <label class="field">
+                <span>วันที่จัดส่ง</span>
+                <input type="date" name="delivery_date" />
+              </label>
+              <label class="field">
+                <span>ช่วงเวลา</span>
+                <select name="delivery_time_slot">
+                  <option value="">เลือกช่วงเวลา</option>
+                  <option value="morning">เช้า</option>
+                  <option value="afternoon">บ่าย</option>
+                  <option value="evening">เย็น</option>
+                </select>
+              </label>
+            </div>
+            <div class="two-col">
+              <label class="field">
+                <span>วิธีชำระเงิน</span>
+                <select name="payment_method">
+                  <option value="transfer">โอน</option>
+                  <option value="promptpay">PromptPay</option>
+                  <option value="cod">เก็บเงินปลายทาง</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>สถานะชำระ</span>
+                <select name="payment_status">
+                  <option value="unpaid">Unpaid</option>
+                  <option value="paid">Paid</option>
+                  <option value="cod">COD</option>
+                  <option value="refunded">Refunded</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="card card--sub">
+            <div class="section__header">
+              <h3>4) เลือกสินค้า</h3>
+              <small class="hint">แสดงเฉพาะสินค้าที่ active/promotion</small>
+            </div>
+            <div id="products-empty" class="empty">กำลังโหลดสินค้า...</div>
+            <div id="product-list" class="product-grid" aria-live="polite"></div>
+          </div>
+
+          <div class="card card--sub">
+            <h3>5) ยืนยันออเดอร์</h3>
+            <div class="summary" id="summary">
+              <div>
+                <p class="muted">จำนวนสินค้า</p>
+                <p id="summary-count" class="summary__value">0 รายการ</p>
+              </div>
+              <div>
+                <p class="muted">ยอดรวมโดยประมาณ</p>
+                <p id="summary-total" class="summary__value">฿0.00</p>
+              </div>
+            </div>
+            <p class="hint">
+              ระบบจะสร้างลูกค้า + ที่อยู่ + ออเดอร์ พร้อมรหัสออเดอร์อัตโนมัติ (รีเซ็ตเลขทุกต้นเดือน)
+            </p>
+            <div class="actions">
+              <button type="submit" class="button" id="submit-order">บันทึกออเดอร์</button>
+              <button type="reset" class="ghost" id="reset-form">ล้างข้อมูล</button>
+            </div>
+            <div id="order-result" class="result" aria-live="polite"></div>
+          </div>
+        </form>
+      </section>
+
+      <section class="section">
+        <div class="section__header">
+          <div>
+            <h2 class="section__title">เช็คสถานะออเดอร์</h2>
+            <p class="section__hint">สำหรับลูกค้าตรวจสอบด้วย order_code + เบอร์โทร</p>
+          </div>
+        </div>
+        <form id="status-form" class="card card--sub stack">
+          <label class="field">
+            <span>เลขออเดอร์ *</span>
+            <input type="text" name="order_code" placeholder="เช่น N-0001" required />
+          </label>
+          <label class="field">
+            <span>เบอร์โทร *</span>
+            <input type="tel" name="phone" placeholder="เช่น 0812345678" required />
+          </label>
+          <div class="actions">
+            <button class="button" type="submit" id="check-status">เช็คสถานะ</button>
+          </div>
+          <div id="status-result" class="result" aria-live="polite"></div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>Phase 4: customer-facing order form + status check (draft)</small>
+    </footer>
+
+    <script src="/assets/js/pwa.js" defer></script>
+    <script src="/assets/js/customer.js" defer></script>
+  </body>
+</html>

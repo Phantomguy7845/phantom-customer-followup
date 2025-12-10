@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Queue</title>
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="hero hero--sub">
+      <div>
+        <p class="breadcrumb"><a href="/">หน้าหลัก</a> / Delivery Queue</p>
+        <h1>คิวจัดส่ง</h1>
+        <p class="muted">รายการออเดอร์ที่จะจัดส่งวันนี้และวันถัด ๆ ไป พร้อมปรับลำดับคิวได้</p>
+      </div>
+      <div class="hero__actions">
+        <a class="button ghost" href="/orders.html">ไปหน้า Orders</a>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="card">
+        <div class="card__header">
+          <div>
+            <h2>ตัวกรอง</h2>
+            <p class="muted small">ค่าเริ่มต้นเลือกวันที่วันนี้และสถานะที่ต้องจัดส่ง</p>
+          </div>
+          <div class="actions">
+            <button id="reload-delivery" class="button ghost">รีเฟรช</button>
+          </div>
+        </div>
+        <form id="filter-form" class="form-grid">
+          <div class="form-control">
+            <label for="delivery-date">วันที่จัดส่ง</label>
+            <input type="date" id="delivery-date" name="delivery-date" />
+            <small class="muted">เลือกวันอื่นเพื่อดูคิวในอนาคต</small>
+          </div>
+          <div class="form-control">
+            <label>สถานะออเดอร์</label>
+            <div class="chip-row" id="order-statuses">
+              <label class="pill pill--choice"> <input type="checkbox" value="confirmed" checked /> confirmed </label>
+              <label class="pill pill--choice"> <input type="checkbox" value="preparing" checked /> preparing </label>
+              <label class="pill pill--choice"> <input type="checkbox" value="out_for_delivery" checked /> out_for_delivery </label>
+              <label class="pill pill--choice"> <input type="checkbox" value="delivered" /> delivered </label>
+            </div>
+          </div>
+          <div class="form-control">
+            <label for="payment-status">สถานะการชำระ</label>
+            <select id="payment-status" name="payment-status">
+              <option value="">ทั้งหมด</option>
+              <option value="unpaid">unpaid</option>
+              <option value="paid">paid</option>
+              <option value="cod">cod</option>
+              <option value="refunded">refunded</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label for="search">ค้นหา</label>
+            <input id="search" name="search" placeholder="ชื่อลูกค้า, เบอร์, order code" />
+          </div>
+          <div class="form-control form-control--actions">
+            <button type="submit" class="button">ใช้ตัวกรอง</button>
+            <button type="button" id="reset-filter" class="button ghost">ล้างค่า</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="card__header">
+          <div>
+            <h2>รายการคิวจัดส่ง</h2>
+            <p id="list-message" class="muted">กำลังโหลด...</p>
+          </div>
+        </div>
+        <div id="delivery-list" class="order-list"></div>
+      </section>
+    </main>
+
+    <section id="detail-drawer" class="drawer hidden">
+      <div class="drawer__backdrop" id="drawer-backdrop"></div>
+      <div class="drawer__panel">
+        <div class="drawer__header">
+          <div>
+            <p class="muted small">รายละเอียดออเดอร์</p>
+            <h3 id="detail-title">-</h3>
+            <div class="pill-row" id="detail-tags"></div>
+          </div>
+          <button id="close-drawer" class="ghost">ปิด</button>
+        </div>
+
+        <div class="stack">
+          <div class="detail-grid">
+            <div class="detail-block">
+              <p class="muted small">ลูกค้า</p>
+              <p id="detail-customer">-</p>
+              <p id="detail-contact" class="muted small">-</p>
+            </div>
+            <div class="detail-block">
+              <p class="muted small">ที่อยู่จัดส่ง</p>
+              <p id="detail-address">-</p>
+              <p id="detail-extra" class="muted small">-</p>
+              <button id="open-map" class="ghost small">เปิดบน Google Maps</button>
+            </div>
+          </div>
+
+          <div class="detail-inline">
+            <div>
+              <p class="muted small">วันที่</p>
+              <strong id="detail-date">-</strong>
+            </div>
+            <div>
+              <p class="muted small">ช่วงเวลา</p>
+              <strong id="detail-slot">-</strong>
+            </div>
+            <div>
+              <p class="muted small">ชำระเงิน</p>
+              <strong id="detail-payment">-</strong>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <p class="muted small">สินค้า</p>
+            <table class="simple-table" id="detail-items"></table>
+          </div>
+
+          <div class="detail-inline">
+            <div>
+              <label for="detail-order-status">สถานะออเดอร์</label>
+              <select id="detail-order-status">
+                <option value="pending">pending</option>
+                <option value="confirmed">confirmed</option>
+                <option value="preparing">preparing</option>
+                <option value="out_for_delivery">out_for_delivery</option>
+                <option value="delivered">delivered</option>
+                <option value="cancelled">cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label for="detail-payment-status">สถานะการชำระ</label>
+              <select id="detail-payment-status">
+                <option value="unpaid">unpaid</option>
+                <option value="paid">paid</option>
+                <option value="cod">cod</option>
+                <option value="refunded">refunded</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <label for="cancel-reason">เหตุผลยกเลิก (เมื่อเลือก cancelled)</label>
+            <select id="cancel-reason">
+              <option value="">-</option>
+              <option value="1">1 สินค้าหมด</option>
+              <option value="2">2 ไม่สะดวกจัดส่ง</option>
+              <option value="3">3 ที่อยู่ไม่ถูกต้อง</option>
+              <option value="4">4 ติดต่อไม่ได้</option>
+              <option value="5">5 อื่น ๆ</option>
+            </select>
+            <textarea id="cancel-text" rows="2" placeholder="ใส่ข้อความเพิ่มเติมถ้ามี"></textarea>
+          </div>
+
+          <div id="detail-message" class="muted small"></div>
+          <div class="actions">
+            <button id="set-out" class="ghost">ยืนยันออกไปจัดส่ง</button>
+            <button id="set-delivered" class="button">จัดส่งสำเร็จ</button>
+            <button id="save-status" class="ghost">บันทึกสถานะ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="/assets/js/pwa.js" defer></script>
+    <script src="/assets/js/delivery.js" type="module"></script>
+  </body>
+</html>

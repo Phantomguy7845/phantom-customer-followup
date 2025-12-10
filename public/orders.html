@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders Monitor</title>
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__title">Orders Monitor</div>
+      <p class="hero__subtitle">
+        รวมออเดอร์ทั้งหมดพร้อม filter/search และเครื่องมือแก้สถานะสำหรับทีมแอดมิน
+      </p>
+      <div class="hero__actions">
+        <a class="ghost" href="/index.html">กลับหน้าหลัก</a>
+        <button id="reload-orders" class="ghost">รีเฟรชรายการ</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="section__header">
+          <div>
+            <h1 class="section__title">ค้นหาออเดอร์</h1>
+            <p class="section__hint">ค้นหาตามชื่อลูกค้า ช่องทางติดต่อ เลขออเดอร์ หรือที่อยู่</p>
+          </div>
+          <div class="chip-row">
+            <span class="pill pill--status">pending</span>
+            <span class="pill pill--status success">paid</span>
+            <span class="pill pill--status warning">out_for_delivery</span>
+          </div>
+        </div>
+        <form id="filter-form" class="filter-grid">
+          <label class="field">
+            <span>ค้นหา (ชื่อ/เบอร์/LINE/FB/เลขออเดอร์/ที่อยู่)</span>
+            <input id="search" name="q" placeholder="เช่น นีโอ หรือ N-0001" />
+          </label>
+
+          <div class="field">
+            <span>สถานะออเดอร์ (เลือกหลายสถานะได้)</span>
+            <div class="chip-select" id="order-statuses">
+              <label><input type="checkbox" value="pending" /> pending</label>
+              <label><input type="checkbox" value="confirmed" /> confirmed</label>
+              <label><input type="checkbox" value="preparing" /> preparing</label>
+              <label><input type="checkbox" value="out_for_delivery" /> out_for_delivery</label>
+              <label><input type="checkbox" value="delivered" /> delivered</label>
+              <label><input type="checkbox" value="cancelled" /> cancelled</label>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>สถานะการชำระเงิน</span>
+            <select id="payment-status">
+              <option value="">ทั้งหมด</option>
+              <option value="unpaid">unpaid</option>
+              <option value="paid">paid</option>
+              <option value="cod">cod</option>
+              <option value="refunded">refunded</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>วิธีชำระเงิน</span>
+            <select id="payment-method">
+              <option value="">ทั้งหมด</option>
+              <option value="transfer">transfer</option>
+              <option value="promptpay">promptpay</option>
+              <option value="cod">cod</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>วันที่สร้าง (จาก)</span>
+            <input id="created-from" type="date" />
+          </label>
+          <label class="field">
+            <span>วันที่สร้าง (ถึง)</span>
+            <input id="created-to" type="date" />
+          </label>
+
+          <label class="field">
+            <span>วันจัดส่ง (จาก)</span>
+            <input id="delivery-from" type="date" />
+          </label>
+          <label class="field">
+            <span>วันจัดส่ง (ถึง)</span>
+            <input id="delivery-to" type="date" />
+          </label>
+
+          <div class="filter-actions">
+            <button type="submit" class="button">ใช้ตัวกรอง</button>
+            <button type="button" id="reset-filter" class="ghost">ล้างตัวกรอง</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section">
+        <div class="section__header">
+          <div>
+            <h2 class="section__title">รายการออเดอร์</h2>
+            <p class="section__hint">เรียงจากล่าสุด → เก่าสุด</p>
+          </div>
+          <div id="list-message" class="muted"></div>
+        </div>
+        <div id="orders-list" class="stack"></div>
+      </section>
+    </main>
+
+    <section id="detail-drawer" class="drawer hidden">
+      <div class="drawer__backdrop" id="drawer-backdrop"></div>
+      <div class="drawer__panel">
+        <header class="drawer__header">
+          <div>
+            <p class="muted small">Order detail</p>
+            <h2 id="detail-title"></h2>
+          </div>
+          <button id="close-drawer" class="ghost">ปิด</button>
+        </header>
+
+        <div class="stack">
+          <div class="pill-row" id="detail-tags"></div>
+
+          <div class="detail-grid">
+            <div>
+              <p class="muted">ลูกค้า</p>
+              <div id="detail-customer"></div>
+              <div id="detail-contact" class="muted"></div>
+            </div>
+            <div>
+              <p class="muted">ที่อยู่จัดส่ง</p>
+              <div id="detail-address"></div>
+              <a id="detail-map" class="small" target="_blank" rel="noreferrer">เปิด Google Maps</a>
+            </div>
+            <div>
+              <p class="muted">จัดส่ง</p>
+              <div id="detail-delivery"></div>
+            </div>
+            <div>
+              <p class="muted">การชำระเงิน</p>
+              <div id="detail-payment"></div>
+            </div>
+          </div>
+
+          <div>
+            <p class="muted">รายการสินค้า</p>
+            <div id="detail-items" class="table-like"></div>
+          </div>
+
+          <div class="card card--sub">
+            <h3>ปรับสถานะ/ข้อมูล</h3>
+            <div class="responsive-grid">
+              <label class="field">
+                <span>สถานะออเดอร์</span>
+                <select id="detail-order-status">
+                  <option value="pending">pending</option>
+                  <option value="confirmed">confirmed</option>
+                  <option value="preparing">preparing</option>
+                  <option value="out_for_delivery">out_for_delivery</option>
+                  <option value="delivered">delivered</option>
+                  <option value="cancelled">cancelled</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>สถานะชำระเงิน</span>
+                <select id="detail-payment-status">
+                  <option value="unpaid">unpaid</option>
+                  <option value="paid">paid</option>
+                  <option value="cod">cod</option>
+                  <option value="refunded">refunded</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>วิธีชำระเงิน</span>
+                <select id="detail-payment-method">
+                  <option value="transfer">transfer</option>
+                  <option value="promptpay">promptpay</option>
+                  <option value="cod">cod</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>วันที่จัดส่ง</span>
+                <input id="detail-delivery-date" type="date" />
+              </label>
+              <label class="field">
+                <span>ช่วงเวลา</span>
+                <input id="detail-time-slot" placeholder="morning/afternoon/evening" />
+              </label>
+              <label class="field">
+                <span>ลำดับคิวจัดส่ง</span>
+                <input id="detail-delivery-order" type="number" min="0" />
+              </label>
+            </div>
+            <div class="actions">
+              <button id="save-status" class="button">บันทึกสถานะ/ข้อมูล</button>
+              <button id="cancel-order" class="ghost danger">ยกเลิกออเดอร์</button>
+            </div>
+            <p id="status-message" class="muted small"></p>
+          </div>
+
+          <div class="card card--sub">
+            <h3>บันทึกของแอดมิน</h3>
+            <label class="field">
+              <span>Admin note</span>
+              <textarea id="detail-admin-note" rows="3" placeholder="เช่น โทรหาลูกค้าตอนเช้า"></textarea>
+            </label>
+            <div class="actions">
+              <button id="save-note" class="button ghost">บันทึก note</button>
+              <span id="note-message" class="muted small"></span>
+            </div>
+          </div>
+
+          <div class="card card--sub danger-area">
+            <h3>เหตุผลการยกเลิก</h3>
+            <div class="responsive-grid">
+              <label class="field">
+                <span>เหตุผล (code)</span>
+                <select id="cancel-reason">
+                  <option value="">เลือกเหตุผล</option>
+                  <option value="1">1 - สินค้าหมด</option>
+                  <option value="2">2 - ไม่สะดวกจัดส่ง</option>
+                  <option value="3">3 - ข้อมูลที่อยู่ลูกค้าไม่ถูกต้อง</option>
+                  <option value="4">4 - ติดต่อกับลูกค้าไม่ได้</option>
+                  <option value="5">5 - อื่น ๆ</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>รายละเอียดเพิ่มเติม (ถ้ามี)</span>
+                <input id="cancel-text" placeholder="บันทึกข้อความเพิ่มเติม" />
+              </label>
+            </div>
+            <p class="muted small">เลือกเหตุผลก่อนกด "ยกเลิกออเดอร์" ด้านบน</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="/assets/js/pwa.js" defer></script>
+    <script src="/assets/js/orders.js" defer></script>
+  </body>
+</html>

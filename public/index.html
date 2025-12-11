@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phantom Customer Follow-up</title>
+    <meta name="theme-color" content="#0ea5e9" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__title">Phantom Customer Follow-up</div>
+      <p class="hero__subtitle">
+        เครื่องมือจัดการลูกค้า ออเดอร์ และคิวจัดส่งในที่เดียว ดีไซน์สบายตา ใช้งานง่ายบนมือถือ
+      </p>
+      <div class="hero__actions">
+        <a class="button" href="/customer.html">สร้างออเดอร์ใหม่</a>
+        <a class="ghost" href="/orders.html">ดูรายการออเดอร์</a>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Customer / Order Form</h2>
+        <p>บันทึกข้อมูลลูกค้า เลือกสินค้า และสร้างเลขออเดอร์อัตโนมัติ</p>
+        <a class="button" href="/customer.html">เปิดหน้าฟอร์มลูกค้า</a>
+      </section>
+      <section class="card">
+        <h2>Admin / Products</h2>
+        <p>จัดการสินค้าและสถานะ active / promotion / inactive เพื่อแสดงผลในฟอร์มลูกค้า</p>
+        <a class="button" href="/admin.html">เปิดหน้า Admin</a>
+      </section>
+      <section class="card">
+        <h2>Orders Monitor</h2>
+        <p>ค้นหาออเดอร์ด้วยชื่อ ช่องทางติดต่อ เลขออเดอร์ หรือที่อยู่ พร้อมปรับสถานะได้ทันที</p>
+        <a class="button" href="/orders.html">เปิด Orders Monitor</a>
+      </section>
+      <section class="card">
+        <h2>Delivery Queue</h2>
+        <p>มอนิเตอร์คิวจัดส่ง แยกตามวัน และปรับลำดับคิวสำหรับทีมขนส่ง</p>
+        <a class="button" href="/delivery.html">เปิดหน้า Delivery</a>
+      </section>
+    </main>
+
+    <section class="status" id="status-panel">
+      <div class="status__header">
+        <h3>สถานะเซิร์ฟเวอร์</h3>
+        <button id="refresh-health" class="ghost">รีเฟรช</button>
+      </div>
+      <pre id="health-output">Loading...</pre>
+    </section>
+
+    <footer class="footer">
+      <small>ระบบจัดการลูกค้าและออเดอร์ | รองรับ PWA และการใช้งานบนมือถือ</small>
+    </footer>
+    <script src="/assets/js/pwa.js" defer></script>
+    <script src="/assets/js/main.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>จัดการสินค้า | Admin</title>
+    <meta name="theme-color" content="#0ea5e9" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/icons/icon-192.png" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__title">จัดการสินค้า</div>
+      <p class="hero__subtitle">
+        เพิ่ม แก้ไข และปรับสถานะสินค้าให้พร้อมขายหรือเป็นโปรโมชัน การออกแบบเน้นมือถือ กดง่ายเห็นชัด
+      </p>
+      <div class="hero__actions">
+        <a class="ghost" href="/">กลับหน้าหลัก</a>
+        <button id="reload-products" class="ghost">รีเฟรชรายการสินค้า</button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="section__header">
+          <div>
+            <h2 class="section__title">เพิ่มสินค้าใหม่</h2>
+            <p class="section__hint">ใส่ชื่อ ราคา และสถานะ ถ้าเป็นโปรให้ระบุราคาโปรโมชัน</p>
+          </div>
+          <span class="pill" id="create-status">พร้อมบันทึก</span>
+        </div>
+        <form id="create-form" class="stack">
+          <div class="two-col">
+            <label class="field">
+              <span>ชื่อสินค้า *</span>
+              <input name="name" required placeholder="เช่น ชานมไข่มุก" />
+            </label>
+            <label class="field">
+              <span>สถานะ</span>
+              <select name="status">
+                <option value="active">เปิดขาย (active)</option>
+                <option value="promotion">โปรโมชัน (promotion)</option>
+                <option value="inactive">ปิดการขาย (inactive)</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label class="field">
+              <span>ราคา (base_price) *</span>
+              <input name="base_price" type="number" step="0.01" required placeholder="เช่น 89" />
+            </label>
+            <label class="field">
+              <span>ราคาโปรโมชัน (ถ้ามี)</span>
+              <input name="promo_price" type="number" step="0.01" placeholder="เช่น 79" />
+            </label>
+          </div>
+          <label class="field">
+            <span>รายละเอียด</span>
+            <textarea name="description" rows="2" placeholder="รสชาติ ส่วนผสม หรือข้อความเสริม"></textarea>
+          </label>
+          <div class="actions">
+            <button class="button" type="submit">บันทึกสินค้า</button>
+          </div>
+          <p class="muted" id="create-message"></p>
+        </form>
+      </section>
+
+      <section class="section">
+        <div class="section__header">
+          <div>
+            <h2 class="section__title">รายการสินค้า</h2>
+            <p class="section__hint">ปรับสถานะ ราคา หรือแก้รายละเอียดได้จากการ์ดรายการ</p>
+          </div>
+          <div class="actions">
+            <label class="field" style="min-width: 180px;">
+              <span>กรองตามสถานะ</span>
+              <select id="filter-status">
+                <option value="">ทั้งหมด</option>
+                <option value="active">active</option>
+                <option value="promotion">promotion</option>
+                <option value="inactive">inactive</option>
+              </select>
+            </label>
+            <label class="field" style="min-width: 220px;">
+              <span>ค้นหา (ชื่อสินค้า)</span>
+              <input id="search" placeholder="เช่น ชานม หรือ milk tea" />
+            </label>
+            <button id="apply-filter" class="button" type="button">ใช้ตัวกรอง</button>
+          </div>
+        </div>
+
+        <div id="product-list" class="product-grid"></div>
+        <p class="muted" id="list-message"></p>
+      </section>
+    </main>
+
+    <script src="/assets/js/pwa.js" defer></script>
+    <script src="/assets/js/admin.js" defer></script>
+  </body>
+</html>

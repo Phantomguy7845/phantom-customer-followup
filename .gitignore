@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log*
+.DS_Store
+.env
+.env.local
+.data/
+data/
+*.sqlite
+
+# Binary icons excluded from PR uploads
+public/assets/icons/*.png
